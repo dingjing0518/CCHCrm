@@ -1,0 +1,133 @@
+<!doctype html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width,  initial-scale=1.0, user-scalable=0, minimum-scale=1.0,  maximum-scale=1.0"/>
+    <title>会员消费获得积分报表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-override.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery-ui-1.10.3.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery-ui.theme.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/base.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/template.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-datetimepicker.min.css}"/>
+    <script type="text/javascript" th:src="@{/lib/jquery-1.8.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery-ui-1.10.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/validate.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/datepicker-zh-CN.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/template.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/fileUpload.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/global.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/confirm.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/bootstrap-datetimepicker.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/locales/bootstrap-datetimepicker.fr.js}"></script>
+</head>
+
+<body>
+<div class="header clearfix">
+    <div th:replace="admin/layout/header::header"></div>
+</div>
+<div class="mainwrapper clearfix">
+    <div th:replace="admin/layout/menu::menu"></div>
+
+    <div class="mainpanel">
+        <div class="member-jfe-wrap container">
+            <div class="hd clearfix">
+                <div class="bar state-bar pull-left">会员消费获得积分报表</div>
+            </div>
+            <div class="show-msg pl70">
+                <form class="form-horizontal pt50" th:action="@{/admin/memberScoreExcel/export}" th:object="${form}" id="queryForm">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">起始日期</label>
+                        <div class="col-md-3">
+                            <input class="form-control datepicker" placeholder=""  type="text" th:field="*{beginTime}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">结束日期</label>
+                        <div class="col-md-3">
+                            <input class="form-control datepicker" placeholder="" type="text" th:field="*{endTime}"/>
+                        </div>
+                    </div>
+                    <div class="group-ft col-xs-offset-4 mt50">
+                        <input type="submit" id="submit" class="btn btn-success col-xs-offset-1" th:value="导出报表" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function(){
+        $('#beginTime').datetimepicker({
+            language:"zh",
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        }).on('changeDate',	function(event){
+            var beginTime=$('#beginTime').val();
+            $("#endTime").datetimepicker('setStartDate',beginTime);
+            $('#beginTime').datetimepicker('hide');
+        });
+        $('#endTime').datetimepicker({
+            language:"zh",
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        }).on('changeDate',	function(event){
+            var beginTime=$('#endTime').val();
+            $("#beginTime").datetimepicker('setEndDate',beginTime);
+            $('#endTime').datetimepicker('hide');
+        });
+        $('#queryForm').validate({
+            onkeyup : false,
+            rules : {
+                beginTime : {
+                    required : true
+                },
+                endTime : {
+                    required : true
+                }
+            },
+            messages : {
+                beginTime : {
+                    required:'起始日期不能为空'
+                },
+                endTime : {
+                    required:'结束日期不能为空'
+                }
+            }
+        });
+
+        $("#queryForm").submit(function(event){
+            var startDate=$("#beginTime").val();
+            var endDate=$("#endTime").val();
+            var days=GetDateDiff(startDate,endDate);
+            if(days>30){
+                alert("查询区间不超过30天！");
+                return false;
+            }else{
+                return true;
+            }
+        });
+        function GetDateDiff(startDate,endDate){
+            var startTime = new Date(Date.parse(startDate.replace(/-/g,   "/"))).getTime();
+            var endTime = new Date(Date.parse(endDate.replace(/-/g,   "/"))).getTime();
+            var dates = Math.abs((startTime - endTime))/(1000*60*60*24);
+            return  dates;
+        }
+    });
+</script>
+</body>
+</html>
+

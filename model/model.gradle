@@ -1,0 +1,18 @@
+buildscript {
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.2.3.RELEASE")
+    }
+	repositories {
+		maven{
+			url "http://maven.aliyun.com/nexus/content/groups/public"
+		}
+	}
+}
+    
+apply plugin: 'spring-boot'
+dependencies {
+   	compile("org.springframework.boot:spring-boot-starter")
+   	compile("org.hibernate:hibernate-validator")
+   	compile("org.hibernate:hibernate-envers:5.0.4.Final")
+	compile("org.springframework.data:spring-data-commons:1.9.2.RELEASE")
+}

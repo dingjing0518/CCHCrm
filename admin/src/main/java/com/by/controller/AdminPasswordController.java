@@ -1,0 +1,58 @@
+package com.by.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import com.by.exception.Success;
+import com.by.json.PasswordJson;
+import com.by.model.Menu;
+import com.by.model.User;
+import com.by.service.UserService;
+
+/**
+ * Created by yagamai on 16-1-7.
+ */
+@Controller
+@RequestMapping("/admin/password")
+public class AdminPasswordController extends BaseController {
+    private final Menu subMenu = new Menu(18);
+    private final String EDIT = "admin/password/edit";
+    @Autowired
+    private UserService service;
+    @Autowired
+    private ShaPasswordEncoder encoder;
+
+    @RequestMapping(method = RequestMethod.PUT)
+    @ResponseBody
+    public Success<String> update(@RequestBody PasswordJson json) {
+        User user = userContext.getCurrentUser();
+        user.setPassword(encoder.encodePassword(json.getPassword(), null));
+        user.setUpdatedBy(user.getName());
+        service.updatePassword(user);
+        return new Success<>("success");
+    }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public String edit(Model uiModel) {
+        return EDIT;
+    }
+
+    @RequestMapping(value = "/duplicate", method = RequestMethod.GET)
+    @ResponseBody
+    public boolean duplicate(@RequestParam("oldPassword") String oldPassword) {
+        User user = userContext.getCurrentUser();
+        if (encoder.encodePassword(oldPassword, null).equals(user.getPassword())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public Menu getSubMenu() {
+        return subMenu;
+    }
+}

@@ -1,0 +1,86 @@
+<!doctype html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width,  initial-scale=1.0, user-scalable=0, minimum-scale=1.0,  maximum-scale=1.0"/>
+    <title>礼品券列表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-override.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery-ui-1.10.3.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/base.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/template.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/jquery-ui.theme.css}"/>
+    <script type="text/javascript" th:src="@{/lib/jquery-1.8.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery-ui-1.10.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/template.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jsRender.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/page.js}"></script>
+</head>
+
+<body>
+<div class="header clearfix">
+    <div th:replace="admin/layout/header::header"></div>
+</div>
+<div class="mainwrapper clearfix">
+    <div th:replace="admin/layout/menu::menu"></div>
+
+    <div class="mainpanel">
+        <div class="gift-wrap container">
+            <div class="hd clearfix">
+                <div class="bar base-bar short-bar pull-left">礼品券</div>
+                <a class="btn btn-info" th:href="@{/admin/giftCoupons?form}">添加</a>
+            </div>
+
+            <table class="table table-striped bg-white">
+                <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>卡券金额</th>
+                    <th>兑换积分</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r:${lists.content}">
+                    <td><a th:text="${r.name}" th:href="@{/admin/__${mall}__/activity/__${r.id}__}">名称</a></td>
+                    <td th:text="${r.enrollBeginTime}" >金额</td>
+                    <td th:text="${r.enrollEndTime}">积分</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="pagination-wrap">
+                <div th:replace="admin/layout/page::page"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script id="detail" type="text/x-jsrender">
+	{{for content}}
+	<tr>
+		<td><a href="/crm/admin/giftCoupons/{{>id}}">{{>name}}</a></td>
+		<td>{{>amount}}</td>
+		<td>{{>score}}</td>
+	</tr>
+	{{/for}}
+</script>
+<script type="text/javascript">
+    $(function () {
+        var tmpl = $.templates("#detail");
+
+        var submitFn = function (data) {
+            if (data.obj.content.length > 0) {
+                var html = tmpl.render(data.obj);
+                console.log(html);
+                $('table tbody').children().remove();
+                $('table tbody').html(html);
+            }
+        };
+
+        $('ul.pagination').pageable({
+            url: global.context + '/admin/giftCoupons/json',
+            fn: submitFn
+        });
+    });
+</script>
+</body>
+</html>

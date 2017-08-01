@@ -1,0 +1,114 @@
+<!doctype html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport"
+          content="width=device-width,  initial-scale=1.0, user-scalable=0, minimum-scale=1.0,  maximum-scale=1.0"/>
+    <title>品牌楼层销售报表</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap-override.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/base.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/template.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/dateRange.css}"/>
+    <script type="text/javascript" th:src="@{/lib/jquery-1.8.3.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/template.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/global.js}"></script>
+    <script type="text/javascript" th:src="@{/js/report/tradingAnalysis.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/echarts.min.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/dateRange.js}"></script>
+    <script type="text/javascript" th:src="@{/lib/macarons.js}"></script>
+</head>
+
+<body>
+<div class="header clearfix">
+    <div th:replace="admin/layout/header::header"></div>
+</div>
+<div class="mainwrapper clearfix">
+    <div th:replace="admin/layout/menu::menu"></div>
+	<div class="ta_date" id="div_date_demo1">
+        <span class="date_title" id="date_demo1"></span>
+        <a class="opt_sel" id="input_trigger_demo1" href="#">
+            <i class="i_orderd"></i>
+        </a>
+    </div>
+	<script type="text/javascript">
+		var date_ = new Date();  
+		var year = date_.getFullYear(); 
+		var month = date_.getMonth() + 1;  
+
+		/**
+		 * 获取当前月的第一天
+		 */
+		function getCurrentMonthFirst(){
+			var firstdate = year + '-' + month + '-01';
+			return firstdate;
+		}
+		/**
+		 * 获取当前月的最后一天
+		 */
+		function getCurrentMonthLast(){
+			var day = new Date(year,month,0);      
+			var lastdate = year + '-' + month + '-' + day.getDate(); 
+			return lastdate;
+		}
+		
+		var startDay = getCurrentMonthFirst();
+		var endDay = getCurrentMonthLast();
+
+		var dateRange = new pickerDateRange('date_demo1', {
+			isTodayValid : true,
+			startDate : startDay,
+			endDate : endDay,
+			defaultText : ' 至 ',
+			stopToday:false,
+			inputTrigger : 'input_trigger_demo1',
+			success : function(obj) {
+				var myChart = echarts.init(document.getElementById('main'), 'macarons');
+				var myChart2 = echarts.init(document.getElementById('main2'), 'macarons');
+				
+				var data = {
+						startTime:obj.startDate,
+						endTime:obj.endDate,
+			    };
+
+				htmlobj=$.ajax({url:global.context + '/admin/tradingAnalysisReport/data',data:data,async:false});
+					
+				option = JSON.parse(htmlobj.responseText);
+				
+				myChart.setOption(option[0]);
+				myChart.on('click', function (params) {
+		            if (params.name == "1F")
+		                myChart2.setOption(option[1]);
+
+		            if (params.name == "2F")
+		                myChart2.setOption(option[2]);
+		            
+		            if (params.name == "3F")
+		                myChart2.setOption(option[3]);
+
+		            if (params.name == "4F")
+		                myChart2.setOption(option[4]);
+		            
+		            if (params.name == "5F")
+		                myChart2.setOption(option[5]);
+		            
+		            if (params.name == "B1F")
+		                myChart2.setOption(option[6]);
+		        });
+			}
+		});
+
+	</script>
+
+    <div class="mainpanel">
+	    <div id="main" style="width: 50%;height: 600px;float:left" ></div>
+	    <div id="main2" style="width: 50%;height: 600px;float:right"></div>
+	</div>
+	
+</div>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>
